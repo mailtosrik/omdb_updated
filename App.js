@@ -1,31 +1,33 @@
 import * as React from 'react';
-import { Button, Text, View, TextInput, StyleSheet } from 'react-native';
+import { Button, Text, View, TextInput, StyleSheet, FlatList, Modal, TouchableHighlight } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { FlatGrid } from 'react-native-super-grid';
 
 var jwtToken;
+// var data;
+// const [filmData, setFilmData] = React.useState('');
 
-function DetailsScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Details!</Text>
-    </View>
-  );
-}
+// function DetailsScreen() {
+//   return (
+//     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+//       <Text>Details!</Text>
+//     </View>
+//   );
+// }
+
+
 
 function createFilm(filmInput, ratingInput) {
-  // alert(filmName);
-  // alert(filmRating);
+
   try {
-    // var filmInput = this.state.filmName;
     if (filmInput == "undefined" || filmInput.trim() == "" || filmInput == null) {
       alert("Please enter a valid film name.");
       // document.getElementById("inputFilm").focus();
       return false;
     }
 
-    // var ratingInput = this.state.rating;
     if (ratingInput == "undefined" || ratingInput == null || ratingInput == "" || ratingInput < 0 || ratingInput > 5) {
       alert("Please provide a rating for the film between 1 and 5.");
       // document.getElementById("inputRating").focus();
@@ -44,12 +46,9 @@ function createFilm(filmInput, ratingInput) {
       setTimeout(function () {
         if (resp.status == 200) {
           alert("Cool!Added your Film into the Database.");
-          // document.getElementById("inputFilm").value = "";
-          // document.getElementById("inputRating").value = "";
         } else {
           alert("Error" + resp.status + ": " + resp.statusText);
-          // document.getElementById("inputFilm").value = "";
-          // document.getElementById("inputRating").value = "";
+
         }
       }, 0)
     });
@@ -67,6 +66,7 @@ function HomeScreen({ navigation }) {
   return (
     <View style={{ flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
       <Text>{"\n"}</Text>
+      <Text style={styles.Text}>Enter the Film Name and your rating!</Text>
       <Text>{"\n"}</Text>
       <TextInput placeholder="Enter Film Name"
         id="filmName"
@@ -134,14 +134,167 @@ function LoginScreen({ navigation }) {
   );
 }
 
-function SettingsScreen({ navigation }) {
+
+
+
+
+
+
+function FilmListScreen({ navigation }) {
+
+  const [data, setData] = React.useState([]);
+  const showFilmList = false;
+  const [isModalVisible, setisModalVisible] = React.useState(false);
+  const [inputText, setInputTextValue] = React.useState("");
+  const [editedItem, setId] = React.useState("");
+  const [updatedRating, setUpdatedRating] = React.useState();
+
+
+  function setModalVisible(bool) {
+    setisModalVisible(bool);
+  }
+
+  function setInputText(rating) {
+    setInputTextValue(rating);
+  }
+
+  function setEditedItem(_id) {
+    setId(_id);
+  }
+
+  function handleEditItem(editedItem, updatedRating) {
+    const newData = data.map(item => {
+      if (item._id === editedItem) {
+        // alert(editedItem);
+        // alert(item);
+        // alert(this.state.inputText);
+        // console.log("--------------------------------------------");
+        // console.log("updated Rating: " + updatedRating);
+        // console.log("--------------------------------------------");
+        // console.log("ID value : " + editedItem);
+
+        try {
+          fetch("http://10.165.1.173:8080/api/v1/films", {
+            method: 'PUT',
+            body: JSON.stringify({ rating: updatedRating, id: editedItem }),
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              'Authorization': 'bearer ' + jwtToken
+            }
+          }).then(resp => {
+            setTimeout(function () {
+              if (resp.status == 200) {
+                alert("Updated your Film rating");
+                // this.getFilms();
+              } else {
+                alert("Error" + resp.status + ": " + resp.statusText);
+                // this.getFilms();
+              }
+            }, 0)
+          });
+          // this.getFilms();
+        } catch (error) {
+          console.log(error);
+          console.log('------------------------');
+        }
+      }
+    })
+  }
+
+  const renderItem = ({ item }) => (
+    <TouchableHighlight onPress={() => { setModalVisible(true); setInputText(item.rating), setEditedItem(item._id) }}>
+      {/* // <Item title={item.name} /> */}
+      <View style={styles.item} >
+        <View style={styles.marginLeft}>
+          {/* <View style={[styles.menu, { backgroundColor: item.color }]}></View>
+        <View style={[styles.menu, { backgroundColor: item.color }]}></View>
+        <View style={[styles.menu, { backgroundColor: item.color }]}></View> */}
+        </View>
+        <Text style={styles.text}> {item.name + ", " + "Rating: " + item.rating} </Text>
+        {/* <Text style={styles.text}> {item.rating} </Text> */}
+      </View>
+    </TouchableHighlight>
+  );
+
+  function getFilms() {
+
+    try {
+      fetch("http://10.165.1.173:8080/api/v1/films", {
+        method: 'GET',
+        json: true,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      }).then((res) => res.json())
+        .then((results) => {
+          if (typeof results != "undefined" &&
+            results != null &&
+            results.length != null &&
+            results.length > 0) {
+            // data = results;
+            setData(results);
+            // console.log(data);
+          }
+          else {
+            alert("No movies are stored in the Database!");
+          }
+        })
+
+      console.log("-------------------------------------------");
+
+    } catch (error) {
+      console.log(error);
+      console.log('-----------------------------');
+    }
+
+
+  }
+
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Settings screen</Text>
-      {/* <Button
-        title="Go to Details"
-        onPress={() => navigation.navigate('Details')}
-      /> */}
+    <View style={{ flex: 1 }}>
+      <Text>{"\n"}</Text>
+      <Button title="Retrieve / Refresh Film List" style={styles.loginBtn} onPress={() => { getFilms(); }} />
+      {/* <SafeAreaView style={styles.container}> */}
+      {/* <FlatList
+          data={data}
+          renderItem={renderItem}
+          keyExtractor={item => item._id}
+        /> */}
+      <Text>{"\n"}</Text>
+      <FlatList
+        data={data}
+        renderItem={renderItem}
+        keyExtractor={item => item._id} />
+
+      <Modal animationType="slide" visible={isModalVisible}
+        onRequestClose={() => setModalVisible(false)}>
+        <View style={styles.modalView}>
+          <Text style={styles.text}>Change Rating:</Text>
+          <TextInput
+            style={styles.textInput}
+            // onChangeText={(text) => { this.setState({ inputText: item.rating }); console.log('state ', this.state.inputText) }}
+            // text={"15"}
+            defaultValue={inputText.toString()}
+            keyboardType={'numeric'}
+            editable={true}
+            multiline={false}
+            maxLength={200}
+            onChangeText={text => setUpdatedRating(text)}
+          // value={this.state.updatedRating}
+          // value={this.state.rating}
+          />
+          <Button title="Save" onPress={() => { handleEditItem(editedItem, updatedRating), getFilms(); setModalVisible(false) }}
+            style={styles.loginBtn}>
+            {/* <Text style={styles.text}>Save</Text> */}
+          </Button>
+        </View>
+      </Modal>
+
+
+      <Text>{"\n"}</Text>
+      {/* </SafeAreaView> */}
     </View>
   );
 }
@@ -168,10 +321,10 @@ function LoginStackScreen() {
 
 const SettingsStack = createStackNavigator();
 
-function SettingsStackScreen() {
+function FilmListStackScreen() {
   return (
     <SettingsStack.Navigator>
-      <SettingsStack.Screen name="Settings" component={SettingsScreen} />
+      <SettingsStack.Screen name="Film List" component={FilmListScreen} />
       {/* <SettingsStack.Screen name="Details" component={DetailsScreen} /> */}
     </SettingsStack.Navigator>
   );
@@ -185,7 +338,7 @@ export default function App() {
       <Tab.Navigator>
         <Tab.Screen name="Login" component={LoginStackScreen} />
         <Tab.Screen name="Home" component={HomeStackScreen} />
-        <Tab.Screen name="Settings" component={SettingsStackScreen} />
+        <Tab.Screen name="Film List" component={FilmListStackScreen} />
       </Tab.Navigator>
     </NavigationContainer>
   );
@@ -224,7 +377,7 @@ const styles = StyleSheet.create({
   },
   loginBtn: {
     width: "100%",
-    backgroundColor: "#fb5b5a",
+    // backgroundColor: "#fb5b5a",
     borderRadius: 25,
     height: 50,
     alignItems: "center",
