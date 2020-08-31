@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "drawer_navigation",
-    "slug": "drawer_navigation",
+    "name": "omdb_mobile",
+    "slug": "omdb_mobile",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/icon_1.png",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/splash_2.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -21,6 +21,10 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "description": "",
+    "android": {
+      "package": "omdb.mobile"
     }
   }
 }

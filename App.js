@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Text, View, TextInput, StyleSheet, FlatList, Modal, TouchableHighlight } from 'react-native';
+import { Button, Text, View, TextInput, StyleSheet, FlatList, Modal, TouchableHighlight, ImageBackground } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -17,7 +17,7 @@ var jwtToken;
 //   );
 // }
 
-
+// const image = require('./images/image_1.jpeg')
 
 function createFilm(filmInput, ratingInput) {
 
@@ -34,7 +34,7 @@ function createFilm(filmInput, ratingInput) {
       return false;
     }
 
-    fetch("http://10.165.1.173:8080/api/v1/films", {
+    fetch("http://10.165.0.204:8080/api/v1/films", {
       method: 'POST',
       body: JSON.stringify({ name: filmInput, rating: ratingInput }),
       headers: {
@@ -66,13 +66,13 @@ function HomeScreen({ navigation }) {
   return (
     <View style={{ flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
       <Text>{"\n"}</Text>
-      <Text style={styles.Text}>Enter the Film Name and your rating!</Text>
+      <Text style={styles.text}>Enter the Film Name and your rating!</Text>
       <Text>{"\n"}</Text>
       <TextInput placeholder="Enter Film Name"
         id="filmName"
         style={{ height: 40, width: 300, borderColor: 'gray', borderWidth: 1 }}
         onChangeText={text => setFilmName(text)}
-      // value={text}
+        value={filmName}
       />
       <Text>{"\n"}</Text>
       <TextInput placeholder="Enter Film Rating (between 1 and 5)"
@@ -81,10 +81,10 @@ function HomeScreen({ navigation }) {
         keyboardType={'numeric'}
         style={{ height: 40, width: 300, borderColor: 'gray', borderWidth: 1 }}
         onChangeText={text => setFilmRating(text)}
-      // value={this.text}
+        value={filmRating}
       />
       <Text>{"\n"}</Text>
-      <Button style={styles.loginBtn} onPress={() => { createFilm(filmName, filmRating); }} title="Submit" />
+      <Button style={styles.loginBtn} onPress={() => { createFilm(filmName, filmRating); setFilmName(""); setFilmRating(""); }} title="Submit" />
     </View>
   );
 }
@@ -95,7 +95,7 @@ function login(userName) {
   }
   else {
     try {
-      fetch("http://10.165.1.173:8080/api/v1/login", {
+      fetch("http://10.165.0.204:8080/api/v1/login", {
         method: 'POST',
         body: JSON.stringify({
           username: userName
@@ -119,25 +119,24 @@ function login(userName) {
 
 function LoginScreen({ navigation }) {
   const [userName, setUserName] = React.useState('');
+  // const [textValue, setTextValue] = React.useState('');
+
+
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      {/* <ImageBackground source={image} style={styles.image}> */}
       <TextInput placeholder="Enter User Name"
         id="userName"
         style={{ height: 40, width: 300, borderColor: 'gray', borderWidth: 1 }}
         onChangeText={text => setUserName(text)}
-      // value={text}
+        value={userName}
       />
       <Text>{"\n"}</Text>
-      <Button style={styles.loginBtn} onPress={() => { login(userName); }} title="Login" />
-
+      <Button style={styles.loginBtn} onPress={() => { login(userName); setUserName(""); }} title="Login" />
+      {/* </ImageBackground> */}
     </View>
   );
 }
-
-
-
-
-
 
 
 function FilmListScreen({ navigation }) {
@@ -174,7 +173,7 @@ function FilmListScreen({ navigation }) {
         // console.log("ID value : " + editedItem);
 
         try {
-          fetch("http://10.165.1.173:8080/api/v1/films", {
+          fetch("http://10.165.0.204:8080/api/v1/films", {
             method: 'PUT',
             body: JSON.stringify({ rating: updatedRating, id: editedItem }),
             headers: {
@@ -211,7 +210,7 @@ function FilmListScreen({ navigation }) {
         <View style={[styles.menu, { backgroundColor: item.color }]}></View>
         <View style={[styles.menu, { backgroundColor: item.color }]}></View> */}
         </View>
-        <Text style={styles.text}> {item.name + ", " + "Rating: " + item.rating} </Text>
+        <Text style={styles.textList}> {item.name + ", " + "Rating: " + item.rating} </Text>
         {/* <Text style={styles.text}> {item.rating} </Text> */}
       </View>
     </TouchableHighlight>
@@ -220,7 +219,7 @@ function FilmListScreen({ navigation }) {
   function getFilms() {
 
     try {
-      fetch("http://10.165.1.173:8080/api/v1/films", {
+      fetch("http://10.165.0.204:8080/api/v1/films", {
         method: 'GET',
         json: true,
         headers: {
@@ -334,47 +333,42 @@ const Tab = createBottomTabNavigator();
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Tab.Navigator>
-        <Tab.Screen name="Login" component={LoginStackScreen} />
-        <Tab.Screen name="Home" component={HomeStackScreen} />
-        <Tab.Screen name="Film List" component={FilmListStackScreen} />
+    <NavigationContainer style={styles.text}>
+      <Tab.Navigator style={styles.text}>
+        <Tab.Screen name="Login" component={LoginStackScreen} style={styles.text} />
+        <Tab.Screen name="Home" component={HomeStackScreen} style={styles.text} />
+        <Tab.Screen name="Film List" component={FilmListStackScreen} style={styles.text} />
       </Tab.Navigator>
     </NavigationContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  logo: {
-    fontWeight: "bold",
-    fontSize: 30,
-    color: "#fb5b5a",
-    marginBottom: 40
-  },
-  inputView: {
-    width: "80%",
-    // backgroundColor: "#465881",
-    borderRadius: 75,
-    height: 50,
-    marginBottom: 50,
-    justifyContent: "center",
-    borderColor: 'gray',
-    padding: 20
-  },
+  // container: {
+  //   flex: 1,
+  //   backgroundColor: '#FFFFFF',
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+  // },
+
+  // inputView: {
+  //   width: "80%",
+  //   // backgroundColor: "#465881",
+  //   borderRadius: 75,
+  //   height: 50,
+  //   marginBottom: 50,
+  //   justifyContent: "center",
+  //   borderColor: 'gray',
+  //   padding: 20
+  // },
   inputText: {
     height: 50,
     color: "white"
   },
-  forgot: {
-    // color: "white",
-    fontSize: 11
-  },
+  // forgot: {
+  //   // color: "white",
+  //   fontSize: 11
+  // },
   loginBtn: {
     width: "100%",
     // backgroundColor: "#fb5b5a",
@@ -385,24 +379,24 @@ const styles = StyleSheet.create({
     marginTop: 40,
     marginBottom: 10
   },
-  loginText: {
-    color: "white",
-    // alignItems:"flex-start"
-  },
-  header: {
-    height: 60,
-    backgroundColor: 'orange',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-  contentContainer: {
-    backgroundColor: 'white',
-  },
+  // loginText: {
+  //   color: "white",
+  //   // alignItems:"flex-start"
+  // },
+  // header: {
+  //   height: 60,
+  //   backgroundColor: 'orange',
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+  // },
+  // headerText: {
+  //   fontSize: 20,
+  //   fontWeight: 'bold',
+  //   color: 'white',
+  // },
+  // contentContainer: {
+  //   backgroundColor: 'white',
+  // },
   item: {
     flexDirection: 'row',
     borderBottomWidth: 1,
@@ -425,7 +419,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginLeft: 10,
   },
-
+  textList: {
+    marginVertical: 30,
+    fontSize: 15,
+    // fontWeight:'',
+    marginLeft: 10,
+  },
   textInput: {
     width: '90%',
     marginLeft: 10,
