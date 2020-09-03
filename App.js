@@ -6,6 +6,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Constants from 'expo-constants';
 
 var jwtToken;
+var ipAddress = 'http://10.165.0.204';
 
 function HomeScreen() {
   const [filmName, setFilmName] = React.useState('');
@@ -26,7 +27,7 @@ function HomeScreen() {
       }
 
       else {
-        fetch("http://10.165.0.204:8080/api/v1/films", {
+        fetch(ipAddress + ":8080/api/v1/films", {
           method: 'POST',
           body: JSON.stringify({ name: filmInput, rating: ratingInput }),
           headers: {
@@ -104,7 +105,7 @@ function login(userName) {
   }
   else {
     try {
-      fetch("http://10.165.0.204:8080/api/v1/login", {
+      fetch(ipAddress + ":8080/api/v1/login", {
         method: 'POST',
         body: JSON.stringify({
           username: userName
@@ -225,7 +226,7 @@ function FilmListScreen({ navigation }) {
         else {
 
           try {
-            fetch("http://10.165.0.204:8080/api/v1/films", {
+            fetch(ipAddress + ":8080/api/v1/films", {
               method: 'PUT',
               body: JSON.stringify({ rating: updatedRating, id: editedItem }),
               headers: {
@@ -263,7 +264,7 @@ function FilmListScreen({ navigation }) {
   function getFilms() {
 
     try {
-      fetch("http://10.165.0.204:8080/api/v1/films", {
+      fetch(ipAddress + ":8080/api/v1/films", {
         method: 'GET',
         json: true,
         headers: {
