@@ -1,91 +1,100 @@
 import * as React from 'react';
-import { Button, Text, View, TextInput, StyleSheet, FlatList, Modal, TouchableHighlight, ImageBackground } from 'react-native';
+import { RefreshControl, ScrollView, Button, Text, View, TextInput, StyleSheet, FlatList, Modal, TouchableHighlight, TouchableWithoutFeedback, Keyboard, ImageBackground } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { FlatGrid } from 'react-native-super-grid';
+import Constants from 'expo-constants';
 
 var jwtToken;
-// var data;
-// const [filmData, setFilmData] = React.useState('');
 
-// function DetailsScreen() {
-//   return (
-//     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-//       <Text>Details!</Text>
-//     </View>
-//   );
-// }
-
-// const image = require('./images/image_1.jpeg')
-
-function createFilm(filmInput, ratingInput) {
-
-  try {
-    if (filmInput == "undefined" || filmInput.trim() == "" || filmInput == null) {
-      alert("Please enter a valid film name.");
-      // document.getElementById("inputFilm").focus();
-      return false;
-    }
-
-    if (ratingInput == "undefined" || ratingInput == null || ratingInput == "" || ratingInput < 0 || ratingInput > 5) {
-      alert("Please provide a rating for the film between 1 and 5.");
-      // document.getElementById("inputRating").focus();
-      return false;
-    }
-
-    fetch("http://10.165.0.204:8080/api/v1/films", {
-      method: 'POST',
-      body: JSON.stringify({ name: filmInput, rating: ratingInput }),
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': 'bearer ' + jwtToken
-      }
-    }).then(resp => {
-      setTimeout(function () {
-        if (resp.status == 200) {
-          alert("Cool!Added your Film into the Database.");
-        } else {
-          alert("Error" + resp.status + ": " + resp.statusText);
-
-        }
-      }, 0)
-    });
-  } catch (e) {
-    console.log(e);
-    console.log('---------------------');
-  }
-  // return false;
-}
-
-function HomeScreen({ navigation }) {
+function HomeScreen() {
   const [filmName, setFilmName] = React.useState('');
   const [filmRating, setFilmRating] = React.useState('');
+  const image = { uri: "https://raw.githubusercontent.com/mailtosrik/gudenberg/master/portrait_2.jpg" };
+
+  function createFilm(filmInput, ratingInput) {
+
+    try {
+      if (filmInput == "undefined" || filmInput.trim() == "" || filmInput == null) {
+        alert("Please enter a valid film name.");
+        return false;
+      }
+
+      else if (ratingInput == "undefined" || ratingInput == null || ratingInput == "" || ratingInput < 0 || ratingInput > 5) {
+        alert("Please provide a rating for the film between 1 and 5.");
+        return false;
+      }
+
+      else {
+        fetch("http://10.165.0.204:8080/api/v1/films", {
+          method: 'POST',
+          body: JSON.stringify({ name: filmInput, rating: ratingInput }),
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'bearer ' + jwtToken
+          }
+        }).then(resp => {
+          setTimeout(function () {
+            if (resp.status == 200) {
+              alert("Cool!Added your Film into the Database.");
+
+            } else {
+              alert("Error" + resp.status + ": " + resp.statusText);
+            }
+
+          }, 0)
+        }
+        );
+      }
+    } catch (e) {
+      console.log(e);
+      console.log('---------------------');
+    }
+  }
 
   return (
-    <View style={{ flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
-      <Text>{"\n"}</Text>
-      <Text style={styles.text}>Enter the Film Name and your rating!</Text>
-      <Text>{"\n"}</Text>
-      <TextInput placeholder="Enter Film Name"
-        id="filmName"
-        style={{ height: 40, width: 300, borderColor: 'gray', borderWidth: 1 }}
-        onChangeText={text => setFilmName(text)}
-        value={filmName}
-      />
-      <Text>{"\n"}</Text>
-      <TextInput placeholder="Enter Film Rating (between 1 and 5)"
-        id="filmRating"
-        style={styles.inputText}
-        keyboardType={'numeric'}
-        style={{ height: 40, width: 300, borderColor: 'gray', borderWidth: 1 }}
-        onChangeText={text => setFilmRating(text)}
-        value={filmRating}
-      />
-      <Text>{"\n"}</Text>
-      <Button style={styles.loginBtn} onPress={() => { createFilm(filmName, filmRating); setFilmName(""); setFilmRating(""); }} title="Submit" />
-    </View>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <ImageBackground source={image} style={styles.image}>
+        <View style={{ flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
+          <Text>{"\n"}</Text>
+          <Text>{"\n"}</Text>
+          <Text>{"\n"}</Text>
+          <Text>{"\n"}</Text>
+          <Text>{"\n"}</Text>
+          <Text style={styles.text, { fontSize: 20 }} >Enter the Film Name and your rating!</Text>
+
+          <Text>{"\n"}</Text>
+
+          <TextInput placeholder="Enter Film Name"
+            id="filmName"
+            style={{ height: 40, width: 300, borderColor: 'gray', borderWidth: 1 }}
+            onChangeText={text => setFilmName(text)}
+            placeholderTextColor="black"
+            value={filmName}
+          />
+          <Text>{"\n"}</Text>
+          <TextInput placeholder="Enter Film Rating (between 1 and 5)"
+            id="filmRating"
+            placeholderTextColor="black"
+            style={styles.inputText}
+            keyboardType={'numeric'}
+            style={{ height: 40, width: 300, borderColor: 'gray', borderWidth: 1, color: 'black' }}
+            onChangeText={text => setFilmRating(text)}
+            value={filmRating}
+          />
+          <Text>{"\n"}</Text>
+          <Button style={styles.loginBtn} onPress={() => {
+            createFilm(filmName, filmRating);
+            setFilmName("");
+            setFilmRating("");
+          }}
+
+            title="Submit" />
+
+        </View>
+      </ImageBackground>
+    </TouchableWithoutFeedback >
   );
 }
 
@@ -107,7 +116,6 @@ function login(userName) {
       })
         .then(resp => resp.json()).then(data => {
           jwtToken = data.token;
-          // alert(this.state.jwtToken);
           alert("Successfully logged in!");
         });
     } catch (e) {
@@ -119,22 +127,43 @@ function login(userName) {
 
 function LoginScreen({ navigation }) {
   const [userName, setUserName] = React.useState('');
-  // const [textValue, setTextValue] = React.useState('');
 
+  const image = { uri: "https://raw.githubusercontent.com/mailtosrik/gudenberg/master/crop%20(1).jpg" };
+  const wait = (timeout) => {
+    return new Promise(resolve => {
+      setTimeout(resolve, timeout);
+    });
+  }
+
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    jwtToken = null;
+    wait(1000).then(() => setRefreshing(false));
+  }, []);
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      {/* <ImageBackground source={image} style={styles.image}> */}
-      <TextInput placeholder="Enter User Name"
-        id="userName"
-        style={{ height: 40, width: 300, borderColor: 'gray', borderWidth: 1 }}
-        onChangeText={text => setUserName(text)}
-        value={userName}
-      />
-      <Text>{"\n"}</Text>
-      <Button style={styles.loginBtn} onPress={() => { login(userName); setUserName(""); }} title="Login" />
-      {/* </ImageBackground> */}
-    </View>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} >
+      <ScrollView
+        contentContainerStyle={styles.scrollView} refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        <ImageBackground source={image} style={styles.image}>
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <TextInput placeholder="Enter User Name"
+              id="userName"
+              style={{ height: 40, width: 300, borderColor: 'gray', borderWidth: 1, backgroundColor: 'white' }}
+              onChangeText={text => setUserName(text)}
+              value={userName}
+            />
+            <Text>{"\n"}</Text>
+            <Button style={styles.loginBtn} onPress={() => { login(userName); setUserName(""); }} title="Login" />
+          </View>
+        </ImageBackground>
+      </ScrollView>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -142,11 +171,33 @@ function LoginScreen({ navigation }) {
 function FilmListScreen({ navigation }) {
 
   const [data, setData] = React.useState([]);
-  const showFilmList = false;
   const [isModalVisible, setisModalVisible] = React.useState(false);
   const [inputText, setInputTextValue] = React.useState("");
   const [editedItem, setId] = React.useState("");
   const [updatedRating, setUpdatedRating] = React.useState();
+  const [movieName, setMovieName] = React.useState("");
+  const image = { uri: "https://raw.githubusercontent.com/mailtosrik/gudenberg/master/plain_portrait.jpg" };
+  const [showList, setShowList] = React.useState(true);
+
+  if (showList) {
+    getFilms();
+    setShowList(false);
+  }
+
+  const wait = (timeout) => {
+    return new Promise(resolve => {
+      setTimeout(resolve, timeout);
+    });
+  }
+
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    getFilms();
+    wait(1000).then(() => setRefreshing(false));
+  }, []);
+
 
 
   function setModalVisible(bool) {
@@ -161,57 +212,50 @@ function FilmListScreen({ navigation }) {
     setId(_id);
   }
 
+  function setMovieNames(filmNamed) {
+    setMovieName(filmNamed)
+  }
+
   function handleEditItem(editedItem, updatedRating) {
     const newData = data.map(item => {
       if (item._id === editedItem) {
-        // alert(editedItem);
-        // alert(item);
-        // alert(this.state.inputText);
-        // console.log("--------------------------------------------");
-        // console.log("updated Rating: " + updatedRating);
-        // console.log("--------------------------------------------");
-        // console.log("ID value : " + editedItem);
+        if (updatedRating == "undefined" || updatedRating == null || updatedRating == "" || updatedRating < 0 || updatedRating > 5) {
+          alert("Please provide a rating for the film between 1 and 5.");
+        }
+        else {
 
-        try {
-          fetch("http://10.165.0.204:8080/api/v1/films", {
-            method: 'PUT',
-            body: JSON.stringify({ rating: updatedRating, id: editedItem }),
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
-              'Authorization': 'bearer ' + jwtToken
-            }
-          }).then(resp => {
-            setTimeout(function () {
-              if (resp.status == 200) {
-                alert("Updated your Film rating");
-                // this.getFilms();
-              } else {
-                alert("Error" + resp.status + ": " + resp.statusText);
-                // this.getFilms();
+          try {
+            fetch("http://10.165.0.204:8080/api/v1/films", {
+              method: 'PUT',
+              body: JSON.stringify({ rating: updatedRating, id: editedItem }),
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'bearer ' + jwtToken
               }
-            }, 0)
-          });
-          // this.getFilms();
-        } catch (error) {
-          console.log(error);
-          console.log('------------------------');
+            }).then(resp => {
+              setTimeout(function () {
+                if (resp.status == 200) {
+                  alert("Updated your rating for the film: " + movieName);
+                } else {
+                  alert("Error" + resp.status + ": " + resp.statusText);
+                }
+              }, 0)
+            });
+
+          } catch (error) {
+            console.log(error);
+            console.log('------------------------');
+          }
         }
       }
     })
   }
 
   const renderItem = ({ item }) => (
-    <TouchableHighlight onPress={() => { setModalVisible(true); setInputText(item.rating), setEditedItem(item._id) }}>
-      {/* // <Item title={item.name} /> */}
+    <TouchableHighlight onPress={() => { setModalVisible(true); setInputText(item.rating), setEditedItem(item._id), setMovieNames(item.name) }}>
       <View style={styles.item} >
-        <View style={styles.marginLeft}>
-          {/* <View style={[styles.menu, { backgroundColor: item.color }]}></View>
-        <View style={[styles.menu, { backgroundColor: item.color }]}></View>
-        <View style={[styles.menu, { backgroundColor: item.color }]}></View> */}
-        </View>
         <Text style={styles.textList}> {item.name + ", " + "Rating: " + item.rating} </Text>
-        {/* <Text style={styles.text}> {item.rating} </Text> */}
       </View>
     </TouchableHighlight>
   );
@@ -232,69 +276,57 @@ function FilmListScreen({ navigation }) {
             results != null &&
             results.length != null &&
             results.length > 0) {
-            // data = results;
             setData(results);
-            // console.log(data);
           }
           else {
             alert("No movies are stored in the Database!");
           }
         })
 
-      console.log("-------------------------------------------");
-
     } catch (error) {
       console.log(error);
       console.log('-----------------------------');
     }
-
-
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      <Text>{"\n"}</Text>
-      <Button title="Retrieve / Refresh Film List" style={styles.loginBtn} onPress={() => { getFilms(); }} />
-      {/* <SafeAreaView style={styles.container}> */}
-      {/* <FlatList
-          data={data}
-          renderItem={renderItem}
-          keyExtractor={item => item._id}
-        /> */}
-      <Text>{"\n"}</Text>
-      <FlatList
-        data={data}
-        renderItem={renderItem}
-        keyExtractor={item => item._id} />
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={{ flex: 1 }}>
 
-      <Modal animationType="slide" visible={isModalVisible}
-        onRequestClose={() => setModalVisible(false)}>
-        <View style={styles.modalView}>
-          <Text style={styles.text}>Change Rating:</Text>
-          <TextInput
-            style={styles.textInput}
-            // onChangeText={(text) => { this.setState({ inputText: item.rating }); console.log('state ', this.state.inputText) }}
-            // text={"15"}
-            defaultValue={inputText.toString()}
-            keyboardType={'numeric'}
-            editable={true}
-            multiline={false}
-            maxLength={200}
-            onChangeText={text => setUpdatedRating(text)}
-          // value={this.state.updatedRating}
-          // value={this.state.rating}
+        <ImageBackground source={image} style={styles.image} >
+
+          <FlatList
+            data={data}
+            renderItem={renderItem}
+            keyExtractor={item => item._id} refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
           />
-          <Button title="Save" onPress={() => { handleEditItem(editedItem, updatedRating), getFilms(); setModalVisible(false) }}
-            style={styles.loginBtn}>
-            {/* <Text style={styles.text}>Save</Text> */}
-          </Button>
-        </View>
-      </Modal>
 
 
-      <Text>{"\n"}</Text>
-      {/* </SafeAreaView> */}
-    </View>
+          <Modal animationType="slide" visible={isModalVisible}
+            onRequestClose={() => setModalVisible(false)}>
+            <View style={styles.modalView}>
+              <Text style={styles.text}>Change Rating:</Text>
+              <TextInput
+                style={styles.textInput}
+                defaultValue={inputText.toString()}
+                keyboardType={'numeric'}
+                editable={true}
+                multiline={false}
+                maxLength={200}
+                onChangeText={text => setUpdatedRating(text)}
+              />
+              <Button title="Save" onPress={() => { handleEditItem(editedItem, updatedRating); getFilms(); setModalVisible(false) }}
+                style={styles.loginBtn}>
+              </Button>
+            </View>
+          </Modal>
+          <Text>{"\n"}</Text>
+        </ImageBackground>
+
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -304,7 +336,6 @@ function HomeStackScreen() {
   return (
     <HomeStack.Navigator>
       <HomeStack.Screen name="Home" component={HomeScreen} />
-      {/* <HomeStack.Screen name="Details" component={DetailsScreen} /> */}
     </HomeStack.Navigator>
   );
 }
@@ -313,7 +344,6 @@ function LoginStackScreen() {
   return (
     <HomeStack.Navigator>
       <HomeStack.Screen name="Login" component={LoginScreen} />
-      {/* <HomeStack.Screen name="Details" component={DetailsScreen} /> */}
     </HomeStack.Navigator>
   );
 }
@@ -324,7 +354,6 @@ function FilmListStackScreen() {
   return (
     <SettingsStack.Navigator>
       <SettingsStack.Screen name="Film List" component={FilmListScreen} />
-      {/* <SettingsStack.Screen name="Details" component={DetailsScreen} /> */}
     </SettingsStack.Navigator>
   );
 }
@@ -344,34 +373,12 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  // container: {
-  //   flex: 1,
-  //   backgroundColor: '#FFFFFF',
-  //   alignItems: 'center',
-  //   justifyContent: 'center',
-  // },
-
-  // inputView: {
-  //   width: "80%",
-  //   // backgroundColor: "#465881",
-  //   borderRadius: 75,
-  //   height: 50,
-  //   marginBottom: 50,
-  //   justifyContent: "center",
-  //   borderColor: 'gray',
-  //   padding: 20
-  // },
   inputText: {
     height: 50,
     color: "white"
   },
-  // forgot: {
-  //   // color: "white",
-  //   fontSize: 11
-  // },
   loginBtn: {
     width: "100%",
-    // backgroundColor: "#fb5b5a",
     borderRadius: 25,
     height: 50,
     alignItems: "center",
@@ -379,24 +386,6 @@ const styles = StyleSheet.create({
     marginTop: 40,
     marginBottom: 10
   },
-  // loginText: {
-  //   color: "white",
-  //   // alignItems:"flex-start"
-  // },
-  // header: {
-  //   height: 60,
-  //   backgroundColor: 'orange',
-  //   alignItems: 'center',
-  //   justifyContent: 'center',
-  // },
-  // headerText: {
-  //   fontSize: 20,
-  //   fontWeight: 'bold',
-  //   color: 'white',
-  // },
-  // contentContainer: {
-  //   backgroundColor: 'white',
-  // },
   item: {
     flexDirection: 'row',
     borderBottomWidth: 1,
@@ -405,13 +394,6 @@ const styles = StyleSheet.create({
   },
   marginLeft: {
     marginLeft: 5,
-  },
-  menu: {
-    width: 20,
-    height: 2,
-    backgroundColor: '#111',
-    margin: 2,
-    borderRadius: 3,
   },
   text: {
     marginVertical: 30,
@@ -422,7 +404,6 @@ const styles = StyleSheet.create({
   textList: {
     marginVertical: 30,
     fontSize: 15,
-    // fontWeight:'',
     marginLeft: 10,
   },
   textInput: {
@@ -445,5 +426,17 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     alignSelf: 'stretch',
     alignItems: 'center',
-  }
+  },
+  image: {
+    flex: 1,
+    resizeMode: "cover",
+    justifyContent: "center"
+  },
+  container: {
+    flex: 1,
+    marginTop: Constants.statusBarHeight,
+  },
+  scrollView: {
+    flex: 1,
+  },
 });
